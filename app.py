@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, render_template, requests
+from flask import Flask, request, jsonify, render_template
 import os
 import io
+import requests
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -30,13 +31,12 @@ def transcribe():
         file=buffer,
         language="ru"
     )
-
-    return {"output": transcript.text}
+    return {"transcription": transcript.text}
 
 @app.route("/generate-fairytale", methods=["POST"])
 def generate_fairytale():
     data = request.json
-    transcription = data.get("transcription")
+    transcription = data.get("userprompt")
 
     if not transcription or len(transcription) < 3:
         return jsonify({"error": "Please provide prompt"}), 400

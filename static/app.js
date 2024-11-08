@@ -1,6 +1,16 @@
 const record = document.querySelector(".record");
 const output = document.querySelector(".prompt");
 
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+      const response = await fetch('/get_transcription');
+      const data = await response.json();
+      document.getElementById('transcription').textContent = data.transcription;
+  } catch (error) {
+      console.error("Error fetching transcription:", error);
+  }
+});
+
 if (navigator.mediaDevices.getUserMedia) {
 
     let onMediaSetupSuccess = function (stream) {
@@ -24,6 +34,7 @@ if (navigator.mediaDevices.getUserMedia) {
         }
 
         mediaRecorder.onstop = function () {
+            alert("Recording stopped");
             let blob = new Blob(chunks, {type: "audio/webm"});
             chunks = [];
 
@@ -51,11 +62,12 @@ if (navigator.mediaDevices.getUserMedia) {
     alert("getUserMedia is not supported in your browser!")
 }
 
+
 let generatedFairytale = ''
 
 async function generateFairytale() {
-  const transcription = document.getElementById('transcription').value
-
+  const transcription = document.getElementById('transcription').textContent
+  alert(transcription)
   if (!transcription) {
     alert('No transcription provided!')
     return
@@ -66,7 +78,7 @@ async function generateFairytale() {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ transcription: transcription }),
+    body: JSON.stringify({ userprompt: transcription }),
   })
 
   const data = await response.json()
