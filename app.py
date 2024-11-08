@@ -1,33 +1,48 @@
-from flask import Flask, request, jsonify, render_template
-import requests
+from flask import Flask, request, jsonify, render_template, requests
 import os
+import io
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-
-app = Flask(__name__)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 VOICE_ID = "OOTZSkkPGHD1csczSCmT"
 # or use premade voices in elevenlabs like CwhRBWXzGAHq8TQ4Fs17
 
+app = Flask(__name__)
+
+client = OpenAI()
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+@app.route("/transcribe", methods=["POST"])
+def transcribe():
+    file = request.files["audio"]
+    buffer = io.BytesIO(file.read())
+    buffer.name = "audio.webm"
+
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=buffer,
+        language="ru"
+    )
+
+    return {"output": transcript.text}
 
 @app.route("/generate-fairytale", methods=["POST"])
 def generate_fairytale():
     data = request.json
-    words = data.get("words")
+    transcription = data.get("transcription")
 
-    if not words or len(words) < 3:
-        return jsonify({"error": "Please provide at least 3 words."}), 400
+    if not transcription or len(transcription) < 3:
+        return jsonify({"error": "Please provide prompt"}), 400
 
-    prompt = f"Write a bed-time story in Russian that fits 2.5 years old and contains the following heros or things: {', '.join(words)}. \
-                The story should be 8-10 short sentences long and end with everybody going to bed."
+    prompt = f"Write a bed-time story in Russian that fits 2.5 years old about: {transcription}. \
+                The story should be 8-10 short sentences long and end with everybody get tired and going to bed."
 
     try:
         response = requests.post(
