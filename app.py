@@ -20,8 +20,11 @@ client = OpenAI()
 def index():
     return render_template("index.html")
 
-@app.route("/transcribe", methods=["POST"])
+@app.route("/transcribe", methods=['GET', 'POST'])
 def transcribe():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
     file = request.files["audio"]
     buffer = io.BytesIO(file.read())
     buffer.name = "audio.webm"
@@ -31,6 +34,7 @@ def transcribe():
         file=buffer,
         language="ru"
     )
+    print(transcript.text)
     return {"transcription": transcript.text}
 
 @app.route("/generate-fairytale", methods=["POST"])
@@ -118,4 +122,4 @@ def voice_over():
 
 
 if __name__ == "__main__":
-    app.run(port=3000)
+    app.run(port=3000, debug=True)

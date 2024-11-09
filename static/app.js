@@ -1,15 +1,6 @@
 const record = document.querySelector(".record");
 const output = document.querySelector(".prompt");
 
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-      const response = await fetch('/get_transcription');
-      const data = await response.json();
-      document.getElementById('transcription').textContent = data.transcription;
-  } catch (error) {
-      console.error("Error fetching transcription:", error);
-  }
-});
 
 if (navigator.mediaDevices.getUserMedia) {
 
@@ -46,7 +37,7 @@ if (navigator.mediaDevices.getUserMedia) {
                 body: formData
             }).then((response) => response.json())
             .then((data) => {
-                output.innerHTML = data.output;
+                document.getElementById('transcription').textContent = data.transcription;
                 document.getElementById('generateButton').style.display = 'inline'
             })
         }
