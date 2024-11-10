@@ -25,7 +25,7 @@ if (navigator.mediaDevices.getUserMedia) {
         }
 
         mediaRecorder.onstop = function () {
-            alert("Recording stopped");
+
             let blob = new Blob(chunks, {type: "audio/webm"});
             chunks = [];
 
@@ -58,7 +58,7 @@ let generatedFairytale = ''
 
 async function generateFairytale() {
   const transcription = document.getElementById('transcription').textContent
-  alert(transcription)
+
   if (!transcription) {
     alert('No transcription provided!')
     return
