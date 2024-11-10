@@ -1,6 +1,7 @@
-## Poem Generation and Voice Over Application
+## Bedtime Story Generation and Voice Over Application
 
-This is a Flask (Python) based web application that generates a poem based on 5 user-provided words using the OpenAI gpt-4o-mini model and performs a voice-over of the generated poem using ElevenLabs' text-to-speech API.
+This is a Flask (Python) based web application that generates a bedtime story for my 2 years old son using OpenAI gpt-4o-mini model and performs a voice-over of the generated poem using ElevenLabs' text-to-speech API.
+As an input it takes voice instructions about the content of the story and transcribes the prompt using OpenAI whisperer model
 
 ### Requirements:
 
@@ -11,14 +12,10 @@ This is a Flask (Python) based web application that generates a poem based on 5 
 - Clone the repository:
 
 ```
-git clone https://github.com/WTMBerlin/generative-ai-course.git
+git clone https://github.com/Morgenmuffel/py-ai-bedtime-story.git
 ```
 
-- Go to the project directory:
-
-```
-cd week-2/py-project-1-poetry-vocalizer
-```
+- Go to the project directory
 
 - Create and activate a virtual environment:
 
