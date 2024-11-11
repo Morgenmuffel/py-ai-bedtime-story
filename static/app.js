@@ -1,6 +1,21 @@
 const record = document.querySelector(".record");
 const output = document.querySelector(".prompt");
+const transcriptionBox = document.getElementById("transcription");
+const fairytaleBox = document.getElementById("fairytale");
+const generateButton = document.getElementById("generateButton");
+const voiceOverButton = document.getElementById("voiceOverButton");
+const loadingIndicator = document.getElementById("loading");
+const screens = Array.from(document.getElementsByClassName("screen"));
+let currentScreen = 0;
+let generatedFairytale = "";
 
+// Function to transition to the next screen with parallax effect
+function showScreen(index) {
+  screens.forEach((screen, i) => {
+    screen.style.transform = `translateY(${(i - index) * 100}vh)`;
+  });
+  currentScreen = index;
+}
 
 if (navigator.mediaDevices.getUserMedia) {
 
@@ -37,8 +52,8 @@ if (navigator.mediaDevices.getUserMedia) {
                 body: formData
             }).then((response) => response.json())
             .then((data) => {
-                document.getElementById('transcription').textContent = data.transcription;
-                document.getElementById('generateButton').style.display = 'inline'
+                transcriptionBox.textContent = data.transcription;
+                showScreen(1);  // Move to transcription confirmation screen
             })
         }
     }
@@ -54,15 +69,17 @@ if (navigator.mediaDevices.getUserMedia) {
 }
 
 
-let generatedFairytale = ''
-
+// Function to generate a fairytale based on the transcribed prompt
 async function generateFairytale() {
-  const transcription = document.getElementById('transcription').textContent
-
+  const transcription = transcriptionBox.textContent;
   if (!transcription) {
-    alert('No transcription provided!')
-    return
+    alert("No transcription available to generate a story!");
+    return;
   }
+
+  // Display loading animation
+  loadingIndicator.style.display = "block";
+  fairytaleBox.style.display = "none";
 
   const response = await fetch('/generate-fairytale', {
     method: 'POST',
@@ -76,10 +93,36 @@ async function generateFairytale() {
   if (data.error) {
     document.getElementById('fairytale').textContent = 'Error generating fairytale: ' + data.error
   } else {
-    generatedFairytale = data.fairytale
-    document.getElementById('fairytale').textContent = data.fairytale
-    document.getElementById('voiceOverButton').style.display = 'inline'
+    loadingIndicator.style.display = "none";  // Hide loading animation
+    fairytaleBox.style.display = "block";     // Show generated story
+    generatedFairytale = data.fairytale;
+    fairytaleBox.textContent = data.fairytale;
+    showScreen(2);  // Move to generated fairytale screen
   }
+}
+
+
+// Function to generate a voice-over for the generated fairytale
+function voiceOverFairytale() {
+  if (!generatedFairytale) {
+    alert("No fairytale available for voice-over!");
+    return;
+  }
+
+  fetch('/voice-over', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fairytale: generatedFairytale })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.audioUrl) {
+      const audioPlayer = document.getElementById("audioPlayer");
+      audioPlayer.src = data.audioUrl;
+      showScreen(3);  // Move to voice-over playback screen
+      audioPlayer.play();
+    }
+  });
 }
 
 async function voiceOverFairytale() {
@@ -87,6 +130,9 @@ async function voiceOverFairytale() {
     alert('No fairytale to voice over!')
     return
   }
+
+  loadingIndicator.textContent = "Generating voiceover..."; // Update loading text for voiceover
+  loadingIndicator.style.display = "block"; // Show loading animation for voice-over
 
   const response = await fetch('/voice-over', {
     method: 'POST',
@@ -98,10 +144,12 @@ async function voiceOverFairytale() {
 
   const data = await response.json()
   if (data.audioUrl) {
-    const audioPlayer = document.createElement('audio')
-    audioPlayer.src = data.audioUrl
-    audioPlayer.controls = true
-    document.body.appendChild(audioPlayer)
-    audioPlayer.play()
+    const audioPlayer = document.getElementById("audioPlayer");
+    audioPlayer.src = data.audioUrl;
+    showScreen(3);  // Move to voice-over playback screen
+    audioPlayer.play();
   }
 }
+
+// Initialize by showing the first screen
+showScreen(0);

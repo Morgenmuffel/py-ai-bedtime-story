@@ -32,7 +32,7 @@ def transcribe():
     transcript = client.audio.transcriptions.create(
         model="whisper-1",
         file=buffer,
-        language="ru"
+        #language="ru"
     )
     print(transcript.text)
     return {"transcription": transcript.text}
@@ -45,7 +45,8 @@ def generate_fairytale():
     if not transcription or len(transcription) < 3:
         return jsonify({"error": "Please provide prompt"}), 400
 
-    prompt = f"Write a bed-time story in Russian that fits 2.5 years old about: {transcription}. \
+    prompt = f"Write a bed-time story that fits 2.5 years old about: {transcription}. \
+                It should be in the same lamguage as the content description above. \
                 The story should be 8-10 short sentences long and end with everybody get tired and going to bed."
 
     try:
