@@ -1,7 +1,7 @@
 ## Bedtime Story Generation and Voice Over Application
 
-This is a Flask (Python) based web application that generates a bedtime story for my 2 years old son using OpenAI gpt-4o-mini model and performs a voice-over of the generated poem using ElevenLabs' text-to-speech API.
-As an input it takes voice instructions about the content of the story and transcribes the prompt using OpenAI whisperer model
+This is a Flask (Python) based web application that generates a bedtime story for my 2 years old son, based on voice instructions about the content/title of the story.
+It uses OpenAI whisperer and gpt-4o-mini model to transcribe the prompt and to generate the story, and performs a voice-over of the generated poem using ElevenLabs' text-to-speech API.
 
 ### Requirements:
 
